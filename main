@@ -1,0 +1,148 @@
+from urllib.request import urlopen
+import requests
+import json
+import sys
+
+#### api for the search function ####
+real_price = 'https://financialmodelingprep.com/api/v3/stock/real-time-price'
+most_lost = 'https://financialmodelingprep.com/api/v3/stock/losers'
+most_gain = 'https://financialmodelingprep.com/api/v3/stock/gainers'
+cryptocurrencies_price = 'https://financialmodelingprep.com/api/v3/cryptocurrencies'
+####
+
+#### Abstraction ####
+error = "Company does not exist... try again"
+info = ['price', 'changes', 'changesPercentage', 'marketCapitalization']
+sentence = ["Current Price: ","Changes: ","Percantage lost: ","Percantage Gain: ","marketCapitalization: "]
+data = [ real_price, cryptocurrencies_price, most_lost, most_gain  ]
+####
+
+json_realprice = requests.get(real_price)
+json_mostlost = requests.get(most_lost)
+json_mostgain = requests.get(most_gain)
+json_crypto = requests.get(cryptocurrencies_price)
+json_realprice = json_realprice.json()
+json_mostlost = json_mostlost.json()
+json_mostgain = json_mostgain.json()
+json_crypto = json_crypto.json()
+
+#### subclass for the def Exlpore ####
+def realprice (url):
+  response = urlopen(url)
+  data = response.read().decode("utf-8")
+  return json.loads(data)
+
+
+
+
+
+
+
+### parent algorithm 
+def choice():
+  choose = input ( "Welcome to the Stock Search! \n" +
+                    "\n" +
+                    "Would you like to: \n " +
+                    str(1) + ". Explore \n " +
+                    str(2) + ". Search   ")
+  if ((str(choose) == "explore") or (int(choose) == 1)):
+    Explore()
+  if ((str(choose) == "search") or (int(choose) == 2)):
+    Search()
+
+### child algorithm 
+def Explore():
+  ser = input("Select your interest \n " +
+            str(1) + ". Real Stock Prices \n " +
+            str(2) + ". Cryptocurrencies Statistics \n " +
+            str(3) + ". Most Lost Stock \n " +
+            str(4) + ". Most Gained Stock  ")
+  if (int(ser) == 1):
+    url = data[0]
+    print(realprice(url))
+    next()
+  if (int(ser) == 2):
+    url = data[1]
+    print(realprice(url))
+    next()
+  if (int(ser) == 3):
+    url = data[2]
+    print(realprice(url))
+    next()
+  if (int(ser) == 4):
+    url = data[3]
+    print(realprice(url))
+    next()
+
+### child algorithm 
+def Search ():
+  global error
+  global info
+  global sentence
+  name = input("Select your interest \n " +
+            str(1) + ". Real Stock Prices \n " +
+            str(2) + ". Cryptocurrencies Statistics \n " +
+            str(3) + ". Most Lost Stock \n " +
+            str(4) + ". Most Gained Stock  ")
+  if (int(name) == 1):
+    realprice = input("Which company would you like to see? ")
+    for a in (json_realprice['stockList']):
+      if (a['symbol'] == (str(realprice).upper())):
+        pa = a[info[0]]
+        print(sentence[0] + str(pa))
+        next()
+      else:
+        print (error)
+        Search()
+  if (int(name) == 2):
+    crypto = input("Which cryptocurrency would you like to see? ")
+    for d in (json_crypto['cryptocurrenciesList']):
+      if (d['name'] == (str(crypto).capitalize())):
+        for z in range(2):
+          pd = d[info[z]]
+          pdd = sentence[z]
+          print(pdd + str(pd))
+        print (sentence[4] + str(d[info[3]]))
+        next()
+      else:
+        print (error)
+        Search()
+  if (int(name) == 3):
+    mostlost = input("Which company would you like to see? ")
+    for b in (json_mostlost['mostLoserStock']):
+      if (b['ticker'] == (str(mostlost).upper())):
+        for x in range(3):
+          pb = b[info[x]]
+          pbb = sentence[x]
+          print (pbb + str(pb))
+        next()
+      else:
+        print (error) 
+        Search()
+  if (int(name) == 4):
+    mostgain = input("Which company would you like to see? ")
+    for c in (json_mostgain['mostGainerStock']):
+      if (c['ticker'] == (str(mostgain).upper())):
+        for y in range(2):
+          pc = c[info[y]]
+          pcc = sentence[y]
+          print(pcc + str(pc))
+        print (sentence[3] + c[info[2]])
+        next()
+      else:
+        print (error)
+        Search()  
+
+### child algorithm 
+
+
+def next():
+  response = input("\nWould you like to explore more? ")
+  if (response == "yes"):
+    choice()
+  elif (response == "no"):
+    print ( "Thank you for using this program")
+    sys.exit()
+
+choice()
+
